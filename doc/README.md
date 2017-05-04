@@ -1,8 +1,9 @@
 # 1. Environment Setup
 
 This session requires [Visual Studio 2017](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15).  
-When prompted to select a workload, select ".NET desktop development".  You can optionally select other workloads if you choose, 
-however for this session we'll be making a console application which only requires this one.
+
+Download and execute the installer from the link above, and when prompted to select a workload, select ".NET desktop development".  
+You can optionally select other workloads if you choose, however for this session we'll be making a console application which only requires this one.
 
 The installation should take about 10 minutes.  
 
