@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace lets_code_ci_session_2
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
         }
     }
