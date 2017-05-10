@@ -47,7 +47,15 @@ Right click "Solution" in the root of the solution tree in the Solution Exporer,
 
 Within the New Project dialog, select "Templates\Visual C#\Test", then select "Unit Test Project (.NET Framework)"
 
-# 3.3 Commit and Push the Project to GitHub
+# 3.3 Move Project Folders
+
+The "add new solution" functionality places the new solution into a subdirectory of the repository root; this isn't necessary.  Fix this by saving and closing 
+Visual Studio, then navigate to the repository folder and cut (ctrl+x) and paste (ctrl+v) the subdirectory into the root.
+
+If done correctly, the root of your repository should contain a ```.sln``` file and two folders; one for your application and one for your tests, as well as
+your readme, .gitignore and a couple of other miscellaneous things._
+
+# 3.4 Commit and Push the Project to GitHub
 
 Select Team Explorer, then click "Changes" to view a list of modified/added files.  The contents of your new project should be listed.
 
@@ -150,3 +158,6 @@ AppVeyor should run again and should pass.
 
 Navigate to [codecov.io](http://codecov.io) and your coverage results should automatically come in from AppVeyor.
 
+# 6 Code Something!
+
+We'll do this part live during the meetup.
