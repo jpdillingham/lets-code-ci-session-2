@@ -79,6 +79,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lets-code-ci-session-2\lets-code-ci-session-2.csproj">
+      <Project>{e2028433-d948-4b96-9e30-9eafc3b83157}</Project>
+      <Name>lets-code-ci-session-2</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
