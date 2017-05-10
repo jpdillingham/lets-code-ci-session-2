@@ -41,7 +41,13 @@ in the same area.  Click on it to open the "New Project" dialog.
 Within the New Project dialog, select "Templates\Visual C#" from the list on the left, then select "Console App (.NET Framework)".  Give the project
 a name of your choosing, then click "OK" to create the project.
 
-# 3.2 Commit and Push the Project to GitHub
+# 3.2 Add a Unit Test Project
+
+Right click "Solution" in the root of the solution tree in the Solution Exporer, then select "Add" -> "New Project".
+
+Within the New Project dialog, select "Templates\Visual C#\Test", then select "Unit Test Project (.NET Framework)"
+
+# 3.3 Commit and Push the Project to GitHub
 
 Select Team Explorer, then click "Changes" to view a list of modified/added files.  The contents of your new project should be listed.
 
@@ -49,3 +55,98 @@ Enter a brief commit message in the box provided, then click "Commit all".
 
 Click the "Home" icon on the small toolbar above the Team Explorer, then select "Sync" from the menu.  The commit you just added should be listed in
 the "Outgoing Commits" section; click the "Push" link to push the commit to GitHub.
+
+# 4 Add References
+
+Expand the Unit Test project, then right click "References" and choose "Manage NuGet Packages..." from the pop-up menu.  The NuGet Package Manager dialog will appear.
+
+Begin by uninstalling the two existing references; we'll be using the Xunit framework as opposed to MSTest.
+
+Next, add the necessary Xunit packages "xunit", "xunit.runner.console", and "xunit.runner.visualstudio".
+
+Add the "OpenCover" and "Moq" packages to handle code coverage and mockups, respectively.
+
+# 4.1 Test the Tests
+
+Replace the content of the automatically generated "UnitTest1.cs" file with the following:
+
+```c#
+using Xunit;
+
+namespace UnitTestProject1
+{
+    public class UnitTest1
+    {
+        [Fact]
+        public void PassingTest()
+        {
+            Assert.Equal(1, 1);
+        }
+
+        [Fact]
+        public void FailingTest()
+        {
+            Assert.Equal(1, 2);
+        }
+    }
+}
+
+```
+
+This will create two unit tests; one passing and one failing.
+
+Run the tests by opening the "Test" menu and selecting "Run" > "All Tests".  Verify that one passing and one failing test are reported.
+
+# 5 Set up Continuous Integration
+
+Now that we have a project scaffolded and our test runner is working we want to set up Continuous Integration with AppVeyor.
+
+Upon a push to the master branch of the repository AppVeyor will clone the repo, build the project and tests, run the tests using the Xunit console
+runner, then use OpenCover to generate a code coverage report.
+
+To get all this working we need to connect our GitHub account to [AppVeyor](https://www.appveyor.com/) and [Codecov](https://codecov.io/).  Make sure you
+are logged in to your GitHub account, then visit both sites and log in using your GitHub account.  You'll be prompted to accept permissions; use your best
+judgment.
+
+Finally, once logged in to AppVeyor, click "Projects" near the top of the page, then click "New Project" and select your repository from the list.
+
+# 5.1 Configure AppVeyor Integration
+
+Next, we need to add instructions for AppVeyor to follow.  We do this by adding an ```appveyor.yml``` file to the root of our repository.  Create this file
+and paste the following contents into it:
+
+```yaml
+version: 1.0.0.{build}
+before_build:
+- cmd: nuget restore
+build:
+  project: ConsoleApp1.sln
+  verbosity: minimal
+test_script:
+- .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"C:\projects\lets-code-test\UnitTestProject1\bin\Debug\UnitTestProject1.dll -noshadow -appveyor" -returntargetcode -filter:"+[*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\coverage.xml
+- "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+- pip install codecov
+- codecov -f "coverage.xml"
+```
+
+The first couple of lines are pretty standard; set the version, perform a nuget restore to pull in all of your referenced packages, and build the solution.
+
+The ```test_script``` section is where things get very specific to the testing environment we are using.
+
+The first line of the script executes OpenCover and forces it to use the Xunit console runner to execute the tests, then outputs a coverage summary to ```coverage.xml```.
+
+Potentially tricky aspects of this line are the OpenCover version (check your packages folder) and the path to your test dll.  AppVeyor clones your repo to the folder ```C:\projects\<your repo name>\```, so 
+be sure to replace "lets-code-test" in the line above with the name of your repo.
+
+Commit your changes and push your repo to GitHub to test.  If everything works as expected, your AppVeyor build should fail due to the failing test we wrote.
+
+# 5.2 Fix your Tests
+
+Modify the ```Assert()``` method call in your ```FailingTest``` method to make the test pass, then commit and push your changes.
+
+AppVeyor should run again and should pass.
+
+# 5.3 View your Code Coverage
+
+Navigate to [codecov.io](http://codecov.io) and your coverage results should automatically come in from AppVeyor.
+
